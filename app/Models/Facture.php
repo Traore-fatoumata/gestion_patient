@@ -1,0 +1,61 @@
+<?php
+
+/**
+ * Created by Reliese Model.
+ */
+
+namespace App\Models;
+
+use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Model;
+
+/**
+ * Class Facture
+ * 
+ * @property int $id
+ * @property string $numero
+ * @property int $patient_id
+ * @property int $rendez_vous_id
+ * @property float $montant
+ * @property Carbon $date_emission
+ * @property string $statut
+ * @property string $description
+ * @property Carbon|null $created_at
+ * @property Carbon|null $updated_at
+ * 
+ * @property Patient $patient
+ * @property RendezVou $rendez_vou
+ *
+ * @package App\Models
+ */
+class Facture extends Model
+{
+	protected $table = 'factures';
+
+	protected $casts = [
+		'patient_id' => 'int',
+		'rendez_vous_id' => 'int',
+		'montant' => 'float',
+		'date_emission' => 'datetime'
+	];
+
+	protected $fillable = [
+		'numero',
+		'patient_id',
+		'rendez_vous_id',
+		'montant',
+		'date_emission',
+		'statut',
+		'description'
+	];
+
+	public function patient()
+	{
+		return $this->belongsTo(Patient::class);
+	}
+
+	public function rendez_vou()
+	{
+		return $this->belongsTo(RendezVou::class, 'rendez_vous_id');
+	}
+}
