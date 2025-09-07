@@ -19,9 +19,7 @@ Route::resource('patients', PatientController::class)->names([
 ]);
 Route::get('patients/search', [PatientController::class, 'search'])->name('patients.search');
 Route::get('patients/{patient}/transmit', [PatientController::class, 'transmit'])->name('patients.transmit');
-Route::get('/', function () {
-    return view('welcome');
-})->name('welcome');
+Route::get('/', [RendezVousController::class, 'create'])->name('welcome');
 Route::get('/rendezvous', [RendezVousController::class, 'index'])->name('rendezvous.index');
 Route::get('/rendezvous/create', [RendezVousController::class, 'create'])->name('rendezvous.creation');
 Route::post('/rendezvous', [RendezVousController::class, 'store'])->name('rendezvous.store');

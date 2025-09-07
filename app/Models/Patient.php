@@ -56,10 +56,10 @@ class Patient extends Model
 		return $this->hasMany(Consultation::class);
 	}
 
-	public function rendez_vous()
-	{
-		return $this->hasMany(RendezVous::class);
-	}
+	// public function rendez_vous()
+	// {
+	// 	return $this->hasMany(RendezVous::class);
+	// }
 	public function factures()
     {
         return $this->hasMany(Facture::class);

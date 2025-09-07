@@ -13,9 +13,12 @@ return new class extends Migration
     {
         Schema::create('rendez_vous', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('patient_id')->constrained('patients')->onDelete('restrict');
+            // $table->foreignId('patient_id')->constrained('patients')->onDelete('restrict');
+            $table->string('nom_complet');
             $table->foreignId('medecin_id')->constrained('medecins')->onDelete('restrict');
             $table->dateTime('date_heure');
+            $table->string('email');
+            $table->string('telephone');
             $table->text('raison')->nullable();
             $table->enum('statut', ['en_attente', 'confirme', 'annule'])->default('en_attente');
             $table->timestamps();

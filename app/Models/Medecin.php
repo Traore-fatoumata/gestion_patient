@@ -27,7 +27,7 @@ use Illuminate\Database\Eloquent\Model;
  * @property Specialite $specialite
  * @property Utilisateur|null $utilisateur
  * @property Collection|Consultation[] $consultations
- * @property Collection|RendezVou[] $rendez_vous
+ * @property Collection|RendezVous[] $rendez_vous
  *
  * @package App\Models
  */
@@ -67,6 +67,6 @@ class Medecin extends Model
 
 	public function rendez_vous()
 	{
-		return $this->hasMany(RendezVou::class);
+		return $this->hasMany(RendezVous::class);
 	}
 }

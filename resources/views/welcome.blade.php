@@ -307,58 +307,52 @@
         </div>
     </section>
 
-    <!-- Rendez-vous Section -->
-    <section id="rendezvous" class="py-5 bg-light-custom">
-        <div class="container">
-            <h2 class="text-center section-title">Prendre Rendez-vous</h2>
-            <div class="row justify-content-center">
-                <div class="col-lg-8">
-                    <div class="card p-4">
-                        <form class="row g-3">
-                            <div class="col-md-6">
-                                <label class="form-label">Nom complet</label>
-                                <input type="text" class="form-control" placeholder="Votre nom complet">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Téléphone</label>
-                                <input type="tel" class="form-control" placeholder="Votre numéro de téléphone">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Email</label>
-                                <input type="email" class="form-control" placeholder="Votre adresse email">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Choisir un médecin</label>
-                                <select class="form-select">
-                                    <option>Sélectionnez un médecin</option>
-                                    <option>Dr. Souare - Médecin Généraliste</option>
-                                    <option>Dr. Diallo - Cardiologue</option>
-                                    <option>Dr. Bah - Pédiatre</option>
-                                </select>
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Date du rendez-vous</label>
-                                <input type="date" class="form-control">
-                            </div>
-                            <div class="col-md-6">
-                                <label class="form-label">Heure du rendez-vous</label>
-                                <input type="time" class="form-control">
-                            </div>
-                            <div class="col-12">
-                                <label class="form-label">Message (optionnel)</label>
-                                <textarea class="form-control" rows="3" placeholder="Précisez ici le motif de votre consultation"></textarea>
-                            </div>
-                            <div class="col-12 text-center mt-4">
-                                <button class="btn btn-primary px-5 py-2">
-                                    <i class="fas fa-paper-plane me-2"></i>Confirmer le rendez-vous
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+    <section class="py-5 bg-light-custom" >
+        <!-- Rendez-vous Section -->
+        <form class="row g-3" method="POST" action="{{ route('rendezvous.store') }}" class="container">
+            @csrf
+            <div class="col-md-6">
+                <label class="form-label">Nom complet</label>
+                <input type="text" class="form-control" name="nom_complet" required>
             </div>
-        </div>
+            <div class="col-md-6">
+                <label class="form-label">Téléphone</label>
+                <input type="tel" class="form-control" name="telephone" required>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email">
+            </div>
+        <div class="col-md-6">
+                <label class="form-label">Choisir un médecin</label>
+                <select class="form-select" name="medecin_id" required>
+                    <option value="">Sélectionnez un médecin</option>
+                    @foreach($medecins as $medecin)
+                        <option value="{{ $medecin->id }}">{{ $medecin->nom }} {{ $medecin->prenom }}</option>
+                    @endforeach
+                </select>
+            </div>
+            <div class="col-md-6">
+                <label class="form-label">Date du rendez-vous</label>
+                <input type="datetime-local" class="form-control" name="date_heure" required>
+            </div>
+
+            {{-- Champ caché pour le statut --}}
+            <input type="hidden" name="statut" value="en_attente">
+
+            
+            <div class="col-12">
+            <label class="form-label">Message (optionnel)</label>
+            <textarea class="form-control" name="raison" rows="3"></textarea>
+            </div>
+            <div class="col-12 text-center mt-4">
+            <button class="btn btn-primary px-5 py-2">
+                <i class="fas fa-paper-plane me-2"></i>Confirmer le rendez-vous
+            </button>
+            </div>
+        </form>
     </section>
+    
 
     <!-- Blog Section -->
     <section id="blog" class="py-5">

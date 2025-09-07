@@ -33,14 +33,17 @@ class RendezVous extends Model
 	protected $table = 'rendez_vous';
 
 	protected $casts = [
-		'patient_id' => 'int',
+		'nom_complet' => 'string',
 		'medecin_id' => 'int',
+		'emqil'=>'string',
 		'date_heure' => 'datetime'
 	];
 
 	protected $fillable = [
-		'patient_id',
+		'nom_complet',
 		'medecin_id',
+		'email',
+		'telephone',
 		'date_heure',
 		'raison',
 		'statut'
@@ -51,10 +54,10 @@ class RendezVous extends Model
 		return $this->belongsTo(Medecin::class);
 	}
 
-	public function patient()
-	{
-		return $this->belongsTo(Patient::class);
-	}
+	// public function patient()
+	// {
+	// 	return $this->belongsTo(Patient::class);
+	// }
 
 	public function consultations()
 	{
