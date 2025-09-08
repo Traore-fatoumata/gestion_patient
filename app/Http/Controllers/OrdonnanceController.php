@@ -15,7 +15,8 @@ class OrdonnanceController extends Controller
     public function index()
     {
         $ordonnances = Ordonnance::with(['consultation', 'elements'])->latest()->get();
-        return view('ordonnances.index', compact('ordonnances'));
+        $consultations = Consultation::all();
+        return view('ordonnances.index', compact('ordonnances','consulations'));
     }
 
     /**

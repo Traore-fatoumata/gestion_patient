@@ -12,7 +12,9 @@ class FactureController extends Controller
     public function index()
     {
         $factures = Facture::with(['patient', 'rendezVous.medecin'])->get();
-        return view('factures.index', compact('factures'));
+        $patients = Patient::all();
+        $rendezVous = RendezVous::all();
+        return view('factures.index', compact('factures','patients'));
     }
 
     public function create()

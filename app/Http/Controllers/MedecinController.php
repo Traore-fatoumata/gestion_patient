@@ -11,14 +11,15 @@ class MedecinController extends Controller
     public function index()
     {
         $medecins = Medecin::with(['specialite', 'utilisateur'])->get();
-        return view('medecins.index', compact('medecins'));
+        $specialites=Specialite::all();
+        return view('medecins.index', compact('medecins','specialites'));
     }
 
     public function create()
     {
         $specialites = Specialite::all();
         $utilisateurs = Utilisateur::all();
-        return view('medecins.creation', compact('specialites', 'utilisateurs'));
+        return view('medecins.index', compact('specialites', 'utilisateurs'));
     }
 
     public function store(Request $request)
@@ -40,14 +41,14 @@ class MedecinController extends Controller
     public function show(Medecin $medecin)
     {
         $medecin->load(['specialite', 'utilisateur', 'rendezVous']);
-        return view('medecins.show', compact('medecin'));
+        return view('medecins.index', compact('medecin'));
     }
 
     public function edit(Medecin $medecin)
     {
         $specialites = Specialite::all();
         $utilisateurs = Utilisateur::all();
-        return view('medecins.edit', compact('medecin', 'specialites', 'utilisateurs'));
+        return view('medecins.index', compact('medecin', 'specialites', 'utilisateurs'));
     }
 
     public function update(Request $request, Medecin $medecin)

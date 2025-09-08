@@ -1,66 +1,208 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Factures - Back-Office</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-500 p-6 text-white">
-        <div class="container mx-auto flex justify-between">
-            <a href="{{ route('welcome') }}" class="text-2xl font-bold">Clinique</a>
-            <div>
-                <a href="{{ route('patients.index') }}" class="px-4 text-2xl font-bold">Patients</a>
-                <a href="{{ route('medecins.index') }}" class="px-4 text-2xl font-bold">Médecins</a>
-                <a href="{{ route('rendezvous.index') }}" class="px-4 text-2xl font-bold">Rendez-vous</a>
-                <a href="{{ route('factures.index') }}" class="px-4 text-2xl font-bold">Factures</a>
-            </div>
-        </div>
-    </nav>
-    <section class="container mx-auto py-12">
-        <h1 class="text-3xl font-bold mb-6">Liste des Factures</h1>
-        @if (session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                {{ session('success') }}
-            </div>
-        @endif
-        <a href="{{ route('factures.create') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-6">Nouvelle Facture</a>
-        @if($factures->isEmpty())
-            <div class="bg-blue-300 border-l-4 border-blue-300 text-white-700 p-4 mb-6" role="alert">
-                Aucune facture enregistrée.
-            </div>
-        @else
-            <table class="w-full bg-white rounded-lg shadow-md">
-                <thead>
-                    <tr class="bg-gray-200 text-gray-600">
-                        <th class="p-4 text-left">Numéro</th>
-                        <th class="p-4 text-left">Patient</th>
-                        <th class="p-4 text-left">Rendez-vous</th>
-                        <th class="p-4 text-left">Montant</th>
-                        <th class="p-4 text-left">Date d’émission</th>
-                        <th class="p-4 text-left">Statut</th>
-                        <th class="p-4 text-left">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($factures as $facture)
-                        <tr>
-                            <td class="p-4">{{ $facture->numero }}</td>
-                            <td class="p-4">{{ $facture->patient->nom }} {{ $facture->patient->prenom }}</td>
-                            <td class="p-4">{{ $facture->rendezVous->date_heure }} ({{ $facture->rendezVous->medecin->nom }})</td>
-                            <td class="p-4">{{ number_format($facture->montant, 2) }} €</td>
-                            <td class="p-4">{{ $facture->date_emission->format('d/m/Y') }}</td>
-                            <td class="p-4">{{ ucfirst(str_replace('_', ' ', $facture->statut)) }}</td>
-                            <td class="p-4">
-                                <a href="{{ route('factures.show', $facture) }}" class="text-blue-600 hover:underline">Voir</a>
-                                <a href="{{ route('factures.edit', $facture) }}" class="text-blue-600 hover:underline ml-2">Modifier</a>
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        @endif
-    </section>
-</body>
-</html>
+@extends('layouts.app')
+
+@section('content')
+<section class="container mx-auto py-12">
+    <h1 class="text-3xl font-bold mb-6">Liste des Factures</h1>
+
+    @if (session('success'))
+        <div class="alert alert-success">{{ session('success') }}</div>
+    @endif
+
+    <!-- Bouton Ajouter -->
+    <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#ajouterFactureModal">
+        Nouvelle Facture
+    </button>
+
+    @if($factures->isEmpty())
+        <div class="alert alert-info">Aucune facture enregistrée.</div>
+    @else
+    <div class="table-responsive">
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>Numéro</th>
+                    <th>Patient</th>
+                    <th>Rendez-vous</th>
+                    <th>Montant</th>
+                    <th>Date d’émission</th>
+                    <th>Statut</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($factures as $facture)
+                <tr>
+                    <td>{{ $facture->numero }}</td>
+                    <td>{{ $facture->patient->nom }} {{ $facture->patient->prenom }}</td>
+                    <td>{{ $facture->rendezVous->date_heure->format('d/m/Y H:i') }} ({{ $facture->rendezVous->medecin->nom }})</td>
+                    <td>{{ number_format($facture->montant, 2) }} €</td>
+                    <td>{{ $facture->date_emission->format('d/m/Y') }}</td>
+                    <td>{{ ucfirst(str_replace('_',' ', $facture->statut)) }}</td>
+                    <td>
+                        <!-- Voir modal -->
+                        <button type="button" class="btn btn-success btn-sm" data-bs-toggle="modal" data-bs-target="#voirFactureModal{{ $facture->id }}">Voir</button>
+                        <!-- Modifier modal -->
+                        <button type="button" class="btn btn-warning btn-sm" data-bs-toggle="modal" data-bs-target="#modifierFactureModal{{ $facture->id }}">Modifier</button>
+                    </td>
+                </tr>
+
+                <!-- Modal Voir Facture -->
+                <div class="modal fade" id="voirFactureModal{{ $facture->id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <div class="modal-header">
+                                <h5 class="modal-title">Facture #{{ $facture->numero }}</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Patient:</strong> {{ $facture->patient->nom }} {{ $facture->patient->prenom }}</p>
+                                <p><strong>Rendez-vous:</strong> {{ $facture->rendezVous->date_heure->format('d/m/Y H:i') }} ({{ $facture->rendezVous->medecin->nom }})</p>
+                                <p><strong>Montant:</strong> {{ number_format($facture->montant, 2) }} €</p>
+                                <p><strong>Date d’émission:</strong> {{ $facture->date_emission->format('d/m/Y') }}</p>
+                                <p><strong>Statut:</strong> {{ ucfirst(str_replace('_',' ', $facture->statut)) }}</p>
+                                <p><strong>Description:</strong> {{ $facture->description ?? 'Aucune' }}</p>
+                            </div>
+                            <div class="modal-footer">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Ajout Facture -->
+                <div class="modal fade" id="modifierFactureModal{{ $facture->id }}" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ route('factures.update', $facture) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Modifier Facture #{{ $facture->numero }}</h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Numéro</label>
+                                        <input type="text" name="numero" value="{{ old('numero', $facture->numero) }}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Patient</label>
+                                        <select name="patient_id" class="form-select" required>
+                                            @foreach ($patients as $patient)
+                                                <option value="{{ $patient->id }}" {{ old('patient_id', $facture->patient_id) == $patient->id ? 'selected':'' }}>
+                                                    {{ $patient->nom }} {{ $patient->prenom }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Rendez-vous</label>
+                                        <select name="rendez_vous_id" class="form-select" required>
+                                            @foreach ($rendezVous as $rdv)
+                                                <option value="{{ $rdv->id }}" {{ old('rendez_vous_id', $facture->rendez_vous_id) == $rdv->id ? 'selected':'' }}>
+                                                    {{ $rdv->date_heure->format('d/m/Y H:i') }} - {{ $rdv->patient->nom }} ({{ $rdv->medecin->nom }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Montant (FG)</label>
+                                        <input type="number" step="0.01" name="montant" value="{{ old('montant', $facture->montant) }}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Date d’émission</label>
+                                        <input type="date" name="date_emission" value="{{ old('date_emission', $facture->date_emission->format('Y-m-d')) }}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Statut</label>
+                                        <select name="statut" class="form-select" required>
+                                            <option value="en_attente" {{ old('statut', $facture->statut)=='en_attente'?'selected':'' }}>En attente</option>
+                                            <option value="payee" {{ old('statut', $facture->statut)=='payee'?'selected':'' }}>Payée</option>
+                                            <option value="annulee" {{ old('statut', $facture->statut)=='annulee'?'selected':'' }}>Annulée</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Description</label>
+                                        <textarea name="description" class="form-control">{{ old('description', $facture->description) }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Mettre à jour</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal fade" id="ajouterFactureModal" tabindex="-1">
+                    <div class="modal-dialog">
+                        <div class="modal-content">
+                            <form action="{{ route('factures.create') }}" method="POST">
+                                @csrf
+                                <div class="modal-header">
+                                    <h5 class="modal-title">Ajouter Une Facture </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label>Numéro</label>
+                                        <input type="text" name="numero" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Patient</label>
+                                        <select name="patient_id" class="form-select" required>
+                                            @foreach ($patients as $patient)
+                                                <option value="{{ $patient->id }}" >
+                                                    {{ $patient->nom }} {{ $patient->prenom }}
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Rendez-vous</label>
+                                        <select name="rendez_vous_id" class="form-select" required>
+                                            @foreach ($rendezVous as $rdv)
+                                                <option value="{{ $rdv->id }}">
+                                                    {{ $rdv->date_heure->format('d/m/Y H:i') }} - {{ $rdv->patient->nom }} ({{ $rdv->medecin->nom }})
+                                                </option>
+                                            @endforeach
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Montant (FG)</label>
+                                        <input type="number" step="0.01" name="montant"  class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Date d’émission</label>
+                                        <input type="date" name="date_emission"  class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Statut</label>
+                                        <select name="statut" class="form-select" required>
+                                            <option value="en_attente" >En attente</option>
+                                            <option value="payee">Payée</option>
+                                            <option value="annulee">Annulée</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Description</label>
+                                        <textarea name="description" class="form-control"></textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+</section>
+
+@endsection

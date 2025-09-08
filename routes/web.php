@@ -55,3 +55,4 @@ Route::resource('factures', FactureController::class)->names([
     'update' => 'factures.update',
 ]);
 Route::get('statistiques', [StatistiquesController::class, 'index'])->name('statistiques.index');
+// Route::post('/logout', [LoginController::class, 'logout'])->name('logout');

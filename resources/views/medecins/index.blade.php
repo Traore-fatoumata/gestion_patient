@@ -1,82 +1,169 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Médecins - Back-Office</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-500 p-6 text-white">
-        <div class="container mx-auto flex justify-between">
-            <a href="{{ route('welcome') }}" class="text-2xl font-bold">Clinique</a>
-            <div>
-                <a href="{{ route('patients.index') }}" class="px-4 text-2xl font-bold">Patients</a>
-                <a href="{{ route('medecins.index') }}" class="px-4 text-2xl font-bold">Médecins</a>
-                <a href="{{ route('rendezvous.index') }}" class="px-4 text-2xl font-bold">Rendez-vous</a>
-                <a href="{{ route('factures.index') }}" class="px-4 text-2xl font-bold">Factures</a>
+@extends('layouts.app')
+
+@section('content')
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">Liste des Médecins</h1>
+        <!-- Bouton ouverture modale ajout -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedecinModal">
+            <i class="bi bi-person-plus"></i> Nouveau Médecin
+        </button>
+    </div>
+
+    <!-- Table des médecins -->
+    <div class="table-responsive">
+        <table class="table table-striped align-middle shadow-sm">
+            <thead class="table-primary">
+                <tr>
+                    <th>Photo</th>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Spécialité</th>
+                    <th>Expérience</th>
+                    <th>Biographie</th>
+                    <th>Utilisateur</th>
+                    <th class="text-center">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($medecins as $medecin)
+                <tr>
+                    <td>
+                        @if ($medecin->photo_url)
+                            <img src="{{ $medecin->photo_url }}" class="rounded-circle" width="50" height="50">
+                        @else
+                            <span class="text-muted">Sans photo</span>
+                        @endif
+                    </td>
+                    <td>{{ $medecin->nom }}</td>
+                    <td>{{ $medecin->prenom }}</td>
+                    <td>{{ $medecin->specialite->nom ?? 'Non spécifiée' }}</td>
+                    <td>{{ $medecin->annees_experience ?? '-' }} ans</td>
+                    <td>{{ Str::limit($medecin->biographie, 40, '...') }}</td>
+                    <td>{{ $medecin->utilisateur->nom ?? 'Non associé' }}</td>
+                    <td class="text-center">
+                        <!-- Bouton ouverture modale édition -->
+                        <button class="btn btn-sm btn-outline-warning"
+                            data-bs-toggle="modal"
+                            data-bs-target="#editMedecinModal{{ $medecin->id }}">
+                            <i class="bi bi-pencil-square"></i>
+                        </button>
+                    </td>
+                </tr>
+
+                <!-- Modal Edition -->
+                <div class="modal fade" id="editMedecinModal{{ $medecin->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg">
+                        <div class="modal-content shadow-lg">
+                            <div class="modal-header bg-warning text-white">
+                                <h5 class="modal-title">Modifier le médecin</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="{{ route('medecins.update', $medecin) }}" method="POST">
+                                @csrf
+                                @method('PUT')
+                                <div class="modal-body">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label class="form-label">Nom</label>
+                                            <input type="text" name="nom" class="form-control"
+                                                value="{{ $medecin->nom }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Prénom</label>
+                                            <input type="text" name="prenom" class="form-control"
+                                                value="{{ $medecin->prenom }}" required>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Spécialité</label>
+                                            <select name="specialite_id" class="form-select" required>
+                                                @foreach($specialites as $specialite)
+                                                    <option value="{{ $specialite->id }}"
+                                                        {{ $medecin->specialite_id == $specialite->id ? 'selected' : '' }}>
+                                                        {{ $specialite->nom }}
+                                                    </option>
+                                                @endforeach
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label class="form-label">Années d’expérience</label>
+                                            <input type="number" name="annees_experience" class="form-control"
+                                                value="{{ $medecin->annees_experience }}">
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Biographie</label>
+                                            <textarea name="biographie" class="form-control">{{ $medecin->biographie }}</textarea>
+                                        </div>
+                                        <div class="col-12">
+                                            <label class="form-label">Photo (URL)</label>
+                                            <input type="text" name="photo_url" class="form-control"
+                                                value="{{ $medecin->photo_url }}">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="submit" class="btn btn-warning">Mettre à jour</button>
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Ajout -->
+<div class="modal fade" id="addMedecinModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content shadow-lg">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Nouveau Médecin</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        </div>
-    </nav>
-    <section class="container mx-auto py-12">
-        <h1 class="text-3xl font-bold mb-6">Liste des Médecins</h1>
-        @if (session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                {{ session('success') }}
-            </div>
-        @endif
-        <div class="mb-6">
-            <form action="{{ route('medecins.search') }}" method="GET" class="flex">
-                <input type="text" name="query" placeholder="Rechercher par nom ou prénom" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ request('query') }}">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700">Rechercher</button>
+            <form action="{{ route('medecins.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label class="form-label">Nom</label>
+                            <input type="text" name="nom" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Prénom</label>
+                            <input type="text" name="prenom" class="form-control" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Spécialité</label>
+                            <select name="specialite_id" class="form-select" required>
+                                <option value="">-- Sélectionner --</option>
+                                @foreach($specialites as $specialite)
+                                    <option value="{{ $specialite->id }}">{{ $specialite->nom }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Années d’expérience</label>
+                            <input type="number" name="annees_experience" class="form-control">
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Biographie</label>
+                            <textarea name="biographie" class="form-control"></textarea>
+                        </div>
+                        <div class="col-12">
+                            <label class="form-label">Photo (URL)</label>
+                            <input type="text" name="photo_url" class="form-control">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Ajouter</button>
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                </div>
             </form>
         </div>
-        <a href="{{ route('medecins.creation') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-6">Nouveau Médecin</a>
-        @if($medecins->isEmpty())
-            <div class="bg-blue-300 border-l-4 border-blue-300 text-white-700 p-4 mb-6" role="alert">
-                Aucun médecin enregistré.
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="w-full bg-white rounded-lg shadow-md">
-                    <thead>
-                        <tr class="bg-gray-200 text-gray-600">
-                            <th class="p-4 text-left">Photo</th>
-                            <th class="p-4 text-left">Nom</th>
-                            <th class="p-4 text-left">Prénom</th>
-                            <th class="p-4 text-left">Spécialité</th>
-                            <th class="p-4 text-left">Années d’expérience</th>
-                            <th class="p-4 text-left">Biographie</th>
-                            <th class="p-4 text-left">Utilisateur</th>
-                            <th class="p-4 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($medecins as $medecin)
-                            <tr>
-                                <td class="p-4">
-                                    @if ($medecin->photo_url)
-                                        <img src="{{ $medecin->photo_url }}" alt="{{ $medecin->nom }}" class="w-12 h-12 rounded-full object-cover">
-                                    @else
-                                        <span>Sans photo</span>
-                                    @endif
-                                </td>
-                                <td class="p-4">{{ $medecin->nom }}</td>
-                                <td class="p-4">{{ $medecin->prenom }}</td>
-                                <td class="p-4">{{ optional($medecin->specialite)->nom ?? 'Non spécifiée' }}</td>
-                                <td class="p-4">{{ $medecin->annees_experience ?? 'Non spécifié' }}</td>
-                                <td class="p-4">{{ Str::limit($medecin->biographie, 30, '...') }}</td>
-                                <td class="p-4">{{ optional($medecin->utilisateur)->nom ?? 'Non associé' }}</td>
-                                <td class="p-4">
-                                    <a href="{{ route('medecins.show', $medecin) }}" class="text-blue-600 hover:underline">Voir</a>
-                                    <a href="{{ route('medecins.edit', $medecin) }}" class="text-blue-600 hover:underline ml-2">Modifier</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </section>
-</body>
-</html>
+    </div>
+</div>
+@endsection

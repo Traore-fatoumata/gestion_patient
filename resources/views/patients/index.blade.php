@@ -1,81 +1,208 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des Patients - Back-Office</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-    <nav class="bg-blue-500 p-6 text-white">
-        <div class="container mx-auto flex justify-between">
-            <a href="{{ route('welcome') }}" class="text-2xl font-bold">Clinique</a>
-            <div>
-                <a href="{{ route('patients.index') }}" class="px-4 text-2xl font-bold">Patients</a>
-                <a href="{{ route('medecins.index') }}" class="px-4 text-2xl font-bold">Médecins</a>
-                <a href="{{ route('rendezvous.index') }}" class="px-4 text-2xl font-bold">Rendez-vous</a>
-                <a href="{{ route('factures.index') }}" class="px-4 text-2xl font-bold">Factures</a>
+@extends('layouts.app')
+
+@section('content')
+<div class="container py-5">
+    
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="fw-bold">Liste des Patients</h1>
+        <!-- Bouton ouverture modale ajout -->
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedecinModal">
+            <i class="bi bi-person-plus"></i> Nouveau Patient
+        </button>
+    </div>
+
+    <!-- Table des patients -->
+    <div class="table-responsive bg-white shadow rounded">
+        <table class="table table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>Nom</th>
+                    <th>Prénom</th>
+                    <th>Date naissance</th>
+                    <th>Genre</th>
+                    <th>Téléphone</th>
+                    <th>Courriel</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach ($patients as $patient)
+                <tr>
+                    <td>{{ $patient->nom }}</td>
+                    <td>{{ $patient->prenom }}</td>
+                    <td>{{ $patient->date_naissance ? $patient->date_naissance->format('d/m/Y') : '-' }}</td>
+                    <td>{{ ucfirst($patient->genre) ?? '-' }}</td>
+                    <td>{{ $patient->telephone ?? '-' }}</td>
+                    <td>{{ $patient->courriel ?? '-' }}</td>
+                    <td>
+                        <!-- Voir -->
+                        <button class="btn btn-sm btn-info" data-bs-toggle="modal" data-bs-target="#viewPatientModal{{ $patient->id }}">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                        <!-- Modifier -->
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#editPatientModal{{ $patient->id }}">
+                            <i class="bi bi-pencil"></i>
+                        </button>
+                        <!-- Supprimer -->
+                        <form action="{{ route('patients.destroy', $patient) }}" method="POST" class="d-inline">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Supprimer ce patient ?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+
+                <!-- Modal Voir Patient -->
+                <div class="modal fade" id="viewPatientModal{{ $patient->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-info text-white">
+                                <h5 class="modal-title">Détails Patient</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <div class="modal-body">
+                                <p><strong>Nom :</strong> {{ $patient->nom }}</p>
+                                <p><strong>Prénom :</strong> {{ $patient->prenom }}</p>
+                                <p><strong>Date Naissance :</strong> {{ $patient->date_naissance ?? '-' }}</p>
+                                <p><strong>Genre :</strong> {{ $patient->genre }}</p>
+                                <p><strong>Adresse :</strong> {{ $patient->adresse }}</p>
+                                <p><strong>Téléphone :</strong> {{ $patient->telephone }}</p>
+                                <p><strong>Email :</strong> {{ $patient->courriel }}</p>
+                                <p><strong>Groupe sanguin :</strong> {{ $patient->groupe_sanguin }}</p>
+                                <p><strong>Antécédents :</strong> {{ $patient->antecedents_medicaux }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal Modifier Patient -->
+                <div class="modal fade" id="editPatientModal{{ $patient->id }}" tabindex="-1">
+                    <div class="modal-dialog modal-lg modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-warning">
+                                <h5 class="modal-title">Modifier Patient</h5>
+                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                            </div>
+                            <form action="{{ route('patients.update', $patient) }}" method="POST">
+                                @csrf @method('PUT')
+                                 <div class="modal-body">
+                                    <div class="mb-3">
+                                        <label class="form-label">Nom</label>
+                                        <input type="text" name="nom" value="{{ $patient->nom }}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Prénom</label>
+                                        <input type="text" name="prenom" value="{{ $patient->prenom }}" class="form-control" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Date de naissance</label>
+                                        <input type="date" name="date_naissance" value="{{ $patient->date_naissance }}" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Genre</label>
+                                        <select name="genre" class="form-select">
+                                            <option value="">Sélectionner</option>
+                                            <option value="homme" {{ $patient->genre=='homme' ? 'selected' : '' }}>Homme</option>
+                                            <option value="femme" {{ $patient->genre=='femme' ? 'selected' : '' }}>Femme</option>
+                                            <option value="autre" {{ $patient->genre=='autre' ? 'selected' : '' }}>Autre</option>
+                                        </select>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Téléphone</label>
+                                        <input type="text" name="telephone" value="{{ $patient->telephone }}" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Email</label>
+                                        <input type="email" name="courriel" value="{{ $patient->courriel }}" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Adresse</label>
+                                        <textarea name="adresse" class="form-control">{{ $patient->adresse }}</textarea>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Groupe sanguin</label>
+                                        <input type="text" name="groupe_sanguin" value="{{ $patient->groupe_sanguin }}" class="form-control">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="form-label">Antécédents médicaux</label>
+                                        <textarea name="antecedents_medicaux" class="form-control">{{ $patient->antecedents_medicaux }}</textarea>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                                    <button class="btn btn-warning">Mettre à jour</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<!-- Modal Ajouter Patient -->
+<div class="modal fade" id="createPatientModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">Nouveau Patient</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
-        </div>
-    </nav>
-    <section class="container mx-auto py-12">
-        <h1 class="text-3xl font-bold mb-6">Liste des Patients</h1>
-        @if (session('success'))
-            <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
-                {{ session('success') }}
-            </div>
-        @endif
-        <div class="mb-6">
-            <form action="{{ route('patients.search') }}" method="GET" class="flex">
-                <input type="text" name="query" placeholder="Rechercher par nom, prénom ou courriel" class="w-full px-4 py-2 border rounded-l-lg focus:outline-none focus:ring-2 focus:ring-blue-500" value="{{ request('query') }}">
-                <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-r-lg hover:bg-blue-700">Rechercher</button>
+            <form action="{{ route('patients.store') }}" method="POST">
+                @csrf
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Nom</label>
+                        <input type="text" name="nom" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Prénom</label>
+                        <input type="text" name="prenom" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Date de naissance</label>
+                        <input type="date" name="date_naissance" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Genre</label>
+                        <select name="genre" class="form-select">
+                            <option value="">Sélectionner</option>
+                            <option value="homme">Homme</option>
+                            <option value="femme">Femme</option>
+                            <option value="autre">Autre</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Téléphone</label>
+                        <input type="text" name="telephone" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Email</label>
+                        <input type="email" name="courriel" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Adresse</label>
+                        <textarea name="adresse" class="form-control"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Groupe sanguin</label>
+                        <input type="text" name="groupe_sanguin" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Antécédents médicaux</label>
+                        <textarea name="antecedents_medicaux" class="form-control"></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button class="btn btn-primary">Créer</button>
+                </div>
             </form>
         </div>
-        <a href="{{ route('patients.creation') }}" class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 mb-6">Nouveau Patient</a>
-        @if($patients->isEmpty())
-            <div class="bg-blue-300 border-l-4 border-blue-300 text-white-700 p-4 mb-6" role="alert">
-                Aucun patient enregistré.
-            </div>
-        @else
-            <div class="overflow-x-auto">
-                <table class="w-full bg-white rounded-lg shadow-md">
-                    <thead>
-                        <tr class="bg-gray-200 text-gray-600">
-                            <th class="p-4 text-left">Nom</th>
-                            <th class="p-4 text-left">Prénom</th>
-                            <th class="p-4 text-left">Date de naissance</th>
-                            <th class="p-4 text-left">Genre</th>
-                            <th class="p-4 text-left">Adresse</th>
-                            <th class="p-4 text-left">Téléphone</th>
-                            <th class="p-4 text-left">Courriel</th>
-                            <th class="p-4 text-left">Groupe sanguin</th>
-                            <th class="p-4 text-left">Antécédents</th>
-                            <th class="p-4 text-left">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach ($patients as $patient)
-                            <tr>
-                                <td class="p-4">{{ $patient->nom }}</td>
-                                <td class="p-4">{{ $patient->prenom }}</td>
-                                <td class="p-4">{{ $patient->date_naissance ? $patient->date_naissance->format('d/m/Y') : 'Non spécifiée' }}</td>
-                                <td class="p-4">{{ ucfirst($patient->genre) ?? 'Non spécifié' }}</td>
-                                <td class="p-4">{{ Str::limit($patient->adresse, 30, '...') }}</td>
-                                <td class="p-4">{{ $patient->telephone ?? 'Non spécifié' }}</td>
-                                <td class="p-4">{{ $patient->courriel ?? 'Non spécifié' }}</td>
-                                <td class="p-4">{{ $patient->groupe_sanguin ?? 'Non spécifié' }}</td>
-                                <td class="p-4">{{ $patient->antecedents_medicaux ? 'Oui' : 'Non' }}</td>
-                                <td class="p-4">
-                                    <a href="{{ route('patients.show', $patient) }}" class="text-blue-600 hover:underline">Voir</a>
-                                    <a href="{{ route('patients.edit', $patient) }}" class="text-blue-600 hover:underline ml-2">Modifier</a>
-                                    <a href="{{ route('patients.transmit', $patient) }}" class="text-blue-600 hover:underline ml-2">Transmettre</a>
-                                </td>
-                            </tr>
-                        @endforeach
-                    </tbody>
-                </table>
-            </div>
-        @endif
-    </section>
-</body>
-</html>
+    </div>
+</div>
+@endsection
