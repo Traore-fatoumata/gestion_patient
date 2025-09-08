@@ -3,7 +3,7 @@
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center-md">
         <h1 class="text-3xl font-bold mb-6">Gestion des Consultations</h1>
-        <button href="{{ route('consultations.create') }}" class="btn btn-info text-white px-4 py-2 rounded-lg mb-4 inline-block">Ajouter une Consultation</button>
+        <button href="#createConsultation" class="btn btn-info text-white px-4 py-2 rounded-lg mb-4 inline-block">Ajouter une Consultation</button>
         <form method="GET" action="{{ route('consultations.index') }}" class="mb-6">
             <input type="text" name="search" placeholder="Rechercher par patient ou médecin" value="{{ request('search') }}" class="border p-2 rounded-lg">
             <button type="submit" class="btn btn-info text-white px-4 py-2 rounded-lg">Rechercher</button>
@@ -52,5 +52,14 @@
     </div>
     <div class="mt-4">{{ $consultations->links() }}</div>
 
+</div>
+<div class="modal fade" id="createConsultation" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+        <div class="modal-content">
+            <form action="{{route('consultations.store')}}" method="POST">
+
+            </form>
+        </div>
+    </div>
 </div>
 @endsection
