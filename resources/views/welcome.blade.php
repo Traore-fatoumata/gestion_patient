@@ -307,7 +307,7 @@
         </div>
     </section>
 
-   <section class="py-5 bg-light-custom">
+   <section class="py-5 bg-light-custom" id="rendezvous">
         <div class="container">
             <h2 class="text-center section-title">Prendre Rendez-vous</h2>
             <div class="row justify-content-center">
@@ -502,7 +502,7 @@
                             </h2>
                             <div id="faq3" class="accordion-collapse collapse">
                                 <div class="accordion-body">
-                                    Vous pouvez annuler ou reporter votre rendez-vous en nous appelant au moins 24 heures à l'avance au +224 6XX XX XX XX.
+                                    Vous pouvez annuler ou reporter votre rendez-vous en nous appelant au moins 24 heures à l'avance au +224 621 10 81 17.
                                 </div>
                             </div>
                         </div>

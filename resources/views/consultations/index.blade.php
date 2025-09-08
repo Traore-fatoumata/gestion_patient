@@ -1,40 +1,28 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion des Consultations - Back-Office</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-</head>
-<body class="bg-gray-100 font-sans">
-     <nav class="bg-blue-500 p-6 text-white">
-    <div class="container mx-auto flex justify-between">
-        <a href="{{ route('welcome') }}" class="text-2xl font-bold">Clinique</a>
-        <div>
-            <a href="{{ route('consultations.index') }}" class="px-4 text-2xl">Consultations</a>
-        </div>
-    </div>
-</nav>
-    <section class="container mx-auto py-12">
+@extends('layouts.app')
+@section('content')
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center-md">
         <h1 class="text-3xl font-bold mb-6">Gestion des Consultations</h1>
-        <a href="{{ route('consultations.create') }}" class="bg-blue-500 text-white px-4 py-2 rounded-lg mb-4 inline-block">Ajouter une Consultation</a>
+        <button href="{{ route('consultations.create') }}" class="btn btn-info text-white px-4 py-2 rounded-lg mb-4 inline-block">Ajouter une Consultation</button>
         <form method="GET" action="{{ route('consultations.index') }}" class="mb-6">
             <input type="text" name="search" placeholder="Rechercher par patient ou médecin" value="{{ request('search') }}" class="border p-2 rounded-lg">
-            <button type="submit" class="bg-blue-500 text-white px-4 py-2 rounded-lg">Rechercher</button>
+            <button type="submit" class="btn btn-info text-white px-4 py-2 rounded-lg">Rechercher</button>
         </form>
         @if(session('success'))
             <div class="bg-green-100 border-l-4 border-green-500 text-green-700 p-4 mb-6" role="alert">
                 {{ session('success') }}
             </div>
         @endif
-        <table class="w-full bg-white shadow-md rounded-lg">
-            <thead>
-                <tr class="bg-gray-200">
-                    <th class="p-4 text-2xl">Rendez-vous</th>
-                    <th class="p-4 text-2xl">Patient</th>
-                    <th class="p-4 text-2xl">Médecin</th>
-                    <th class="p-4 text-2xl">Date Consultation</th>
-                    <th class="p-4 text-2xl">Actions</th>
+    </div>
+    <div class="table-responsive bg-while shadow rounded">
+        <table class="table table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th >Rendez-vous</th>
+                    <th >Patient</th>
+                    <th >Médecin</th>
+                    <th >Date Consultation</th>
+                    <th >Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -61,7 +49,8 @@
                 @endforelse
             </tbody>
         </table>
-        <div class="mt-4">{{ $consultations->links() }}</div>
-    </section>
-</body>
-</html>
+    </div>
+    <div class="mt-4">{{ $consultations->links() }}</div>
+
+</div>
+@endsection

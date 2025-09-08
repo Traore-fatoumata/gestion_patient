@@ -87,6 +87,8 @@
                     <li><a href="{{ route('rendezvous.index') }}" class="nav-link px-2 {{ request()->routeIs('rendezvous.*') ? 'active' : '' }}"><i class="bi bi-calendar-check me-2"></i> Rendez-vous</a></li>
                     <li><a href="{{ route('factures.index') }}" class="nav-link px-2 {{ request()->routeIs('factures.*') ? 'active' : '' }}"><i class="bi bi-receipt me-2"></i> Factures</a></li>
                     <li><a href="{{ route('statistiques.index') }}" class="nav-link px-2 {{ request()->routeIs('statistiques.*') ? 'active' : '' }}"><i class="bi bi-bar-chart-line me-2"></i> Statistiques</a></li>
+                    <li><a href="{{ route('consultations.index') }}" class="nav-link px-2 {{ request()->routeIs('consultations.*') ? 'active' : '' }}"><i class="bi bi-people me-2"></i> Consultations</a></li>
+
                 </ul>
             </div>
 
