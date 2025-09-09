@@ -14,7 +14,7 @@ class FactureController extends Controller
         $factures = Facture::with(['patient', 'rendezVous.medecin'])->get();
         $patients = Patient::all();
         $rendezVous = RendezVous::all();
-        return view('factures.index', compact('factures','patients'));
+        return view('factures.index', compact('factures','patients','rendezVous'));
     }
 
     public function create()

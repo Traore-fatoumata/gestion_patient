@@ -35,7 +35,8 @@ class RendezVous extends Model
 	protected $casts = [
 		'nom_complet' => 'string',
 		'medecin_id' => 'int',
-		'emqil'=>'string',
+		'email'=>'string',
+		'telephone'=>'string',
 		'date_heure' => 'datetime'
 	];
 
@@ -54,10 +55,10 @@ class RendezVous extends Model
 		return $this->belongsTo(Medecin::class);
 	}
 
-	// public function patient()
-	// {
-	// 	return $this->belongsTo(Patient::class);
-	// }
+	public function patient()
+	{
+		return $this->belongsTo(Patient::class);
+	}
 
 	public function consultations()
 	{

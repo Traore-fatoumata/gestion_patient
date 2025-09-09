@@ -6,7 +6,7 @@
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1 class="fw-bold">Liste des Patients</h1>
         <!-- Bouton ouverture modale ajout -->
-        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addMedecinModal">
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#createPatientModal">
             <i class="bi bi-person-plus"></i> Nouveau Patient
         </button>
     </div>

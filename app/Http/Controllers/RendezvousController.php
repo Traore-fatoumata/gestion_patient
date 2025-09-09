@@ -5,26 +5,35 @@ namespace App\Http\Controllers;
 use App\Models\RendezVous;
 use App\Models\Medecin;
 use Illuminate\Http\Request;
+use App\Http\Controllers\Patient;
+use App\Models\Patient as ModelsPatient;
 
 class RendezVousController extends Controller
 {
     public function index(Request $request)
-    {
-        $search = $request->query('search');
+{
+    $search = $request->input('search');
 
-        $rendezVous = RendezVous::with(['medecin'])
-            ->when($search, function ($query, $search) {
-                $query->whereHas('medecin', function ($q) use ($search) {
-                    $q->where('nom', 'like', "%$search%")
-                      ->orWhere('prenom', 'like', "%$search%");
-                });
+    $rendezVous = RendezVous::with(['patient', 'medecin.specialite'])
+        ->when($search, function($query, $search) {
+            $query->whereHas('patient', function($q) use ($search) {
+                $q->where('nom', 'like', "%$search%")
+                  ->orWhere('prenom', 'like', "%$search%");
             })
-            ->paginate(10);
+            ->orWhereHas('medecin', function($q) use ($search) {
+                $q->where('nom', 'like', "%$search%")
+                  ->orWhere('prenom', 'like', "%$search%");
+            });
+        })
+        ->paginate(10);
 
-        $medecins = Medecin::all();
+    // 🔹 Ajouter patients et medecins
+    $patients = ModelsPatient::all();
+    $medecins = Medecin::with('specialite')->get();
 
-        return view('rendezvous.index', compact('rendezVous', 'medecins'));
-    }
+    return view('rendezvous.index', compact('rendezVous', 'patients', 'medecins'));
+}
+
 
     public function create()
     {

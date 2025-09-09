@@ -33,7 +33,7 @@
             <tbody>
                 @forelse($rendezVous as $rdv)
                 <tr>
-                    <td>{{ optional($rdv->patient)->nom }} {{ optional($rdv->patient)->prenom }}</td>
+                    <td>{{ $rdv->nom_complet}}</td>
                     <td>{{ optional($rdv->medecin)->nom }} {{ optional($rdv->medecin)->prenom }}</td>
                     <td>{{ $rdv->date_heure->format('d/m/Y H:i') }}</td>
                     <td>{{ ucfirst($rdv->statut) }}</td>

@@ -134,10 +134,15 @@
                         </div>
                     </div>
                 </div>
-                <div class="modal fade" id="ajouterFactureModal" tabindex="-1">
+                @endforeach
+            </tbody>
+        </table>
+    </div>
+    @endif
+    <div class="modal fade" id="ajouterFactureModal" tabindex="-1">
                     <div class="modal-dialog">
                         <div class="modal-content">
-                            <form action="{{ route('factures.create') }}" method="POST">
+                            <form action="{{ route('factures.store') }}" method="POST">
                                 @csrf
                                 <div class="modal-header">
                                     <h5 class="modal-title">Ajouter Une Facture </h5>
@@ -197,12 +202,6 @@
                         </div>
                     </div>
                 </div>
-
-                @endforeach
-            </tbody>
-        </table>
-    </div>
-    @endif
 </section>
 
 @endsection
