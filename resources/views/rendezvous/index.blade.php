@@ -1,12 +1,12 @@
 @extends('layouts.app')
-@section( 'content')
+@section('content')
 <section class="container mx-auto py-12">
     <h1 class="text-4xl font-bold mb-6">Gestion des Rendez-vous</h1>
 
     <!-- Bouton Ajouter -->
-    <button type="button" class="btn btn-primary mb-4" onclick="window.location.href='{{ route('rendezvous.creation') }}'">
-        Ajouter un Rendez-vous
-    </button>
+    <a href="{{ route('rendezvous.creation') }}" class="btn btn-primary mb-4">
+    Ajouter un Rendez-vous
+</a>
 
     <!-- Recherche -->
     <form method="GET" action="{{ route('rendezvous.index') }}" class="mb-6 d-flex gap-2">
@@ -33,7 +33,7 @@
             <tbody>
                 @forelse($rendezVous as $rdv)
                 <tr>
-                    <td>{{ $rdv->nom_complet}}</td>
+                    <td>{{ $rdv->nom_complet }}</td>
                     <td>{{ optional($rdv->medecin)->nom }} {{ optional($rdv->medecin)->prenom }}</td>
                     <td>{{ $rdv->date_heure->format('d/m/Y H:i') }}</td>
                     <td>{{ ucfirst($rdv->statut) }}</td>
@@ -62,7 +62,9 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <p><strong>Patient:</strong> {{ optional($rdv->patient)->nom }} {{ optional($rdv->patient)->prenom }}</p>
+                                <p><strong>Patient:</strong> {{ $rdv->nom_complet }}</p>
+                                <p><strong>Téléphone:</strong> {{ $rdv->telephone }}</p>
+                                <p><strong>Email:</strong> {{ $rdv->email }}</p>
                                 <p><strong>Médecin:</strong> {{ optional($rdv->medecin)->nom }} {{ optional($rdv->medecin)->prenom }}</p>
                                 <p><strong>Date/Heure:</strong> {{ $rdv->date_heure->format('d/m/Y H:i') }}</p>
                                 <p><strong>Motif:</strong> {{ $rdv->raison ?? 'Non spécifié' }}</p>
@@ -88,12 +90,16 @@
                                 </div>
                                 <div class="modal-body">
                                     <div class="mb-3">
-                                        <label>Patient</label>
-                                        <select name="patient_id" class="form-select" required>
-                                            @foreach($patients as $patient)
-                                                <option value="{{ $patient->id }}" {{ $rdv->patient_id == $patient->id ? 'selected' : '' }}>{{ $patient->nom }} {{ $patient->prenom }}</option>
-                                            @endforeach
-                                        </select>
+                                        <label>Nom complet</label>
+                                        <input type="text" name="nom_complet" class="form-control" value="{{ $rdv->nom_complet }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Téléphone</label>
+                                        <input type="tel" name="telephone" class="form-control" value="{{ $rdv->telephone }}" required>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label>Email</label>
+                                        <input type="email" name="email" class="form-control" value="{{ $rdv->email }}">
                                     </div>
                                     <div class="mb-3">
                                         <label>Médecin</label>

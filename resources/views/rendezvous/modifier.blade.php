@@ -8,15 +8,15 @@
 </head>
 <body class="bg-gray-100 font-sans">
     <nav class="bg-blue-500 p-4 text-white">
-    <div class="container mx-auto flex justify-between">
-        <a href="{{ route('welcome') }}" class="text-2xl font-bold">Clinique</a>
-        <div>
-            <a href="{{ route('rendezvous.index') }}" class="px-4">Rendez-vous</a>
-            <a href="{{ route('patients.index') }}" class="px-4">Patients</a>
-            <a href="{{ route('medecins.index') }}" class="px-4">Médecins</a>
+        <div class="container mx-auto flex justify-between">
+            <a href="{{ route('welcome') }}" class="text-2xl font-bold">Clinique</a>
+            <div>
+                <a href="{{ route('rendezvous.index') }}" class="px-4">Rendez-vous</a>
+                <a href="{{ route('patients.index') }}" class="px-4">Patients</a>
+                <a href="{{ route('medecins.index') }}" class="px-4">Médecins</a>
+            </div>
         </div>
-    </div>
-</nav>
+    </nav>
     <section class="container mx-auto py-12">
         <h1 class="text-3xl font-bold mb-6">Modifier un Rendez-vous</h1>
         @if($errors->any())
@@ -32,34 +32,40 @@
             @csrf
             @method('PUT')
             <div class="mb-4">
-                <label for="patient_id" class="block text-sm font-medium text-gray-700">Patient</label>
-                <select name="patient_id" id="patient_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
-                    <option value="">Sélectionnez un patient</option>
-                    @foreach($patients as $patient)
-                        <option value="{{ $patient->id }}" {{ $rendezVous->patient_id == $patient->id ? 'selected' : '' }}>{{ $patient->nom }} {{ $patient->prenom }}</option>
-                    @endforeach
-                </select>
+                <label class="form-label">Nom complet</label>
+                <input type="text" class="form-control" name="nom_complet" value="{{ old('nom_complet', $rendezVous->nom_complet) }}" required>
             </div>
             <div class="mb-4">
-                <label for="medecin_id" class="block text-sm font-medium text-gray-700">Médecin</label>
-                <select name="medecin_id" id="medecin_id" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <label class="form-label">Téléphone</label>
+                <input type="tel" class="form-control" name="telephone" value="{{ old('telephone', $rendezVous->telephone) }}" required>
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Email</label>
+                <input type="email" class="form-control" name="email" value="{{ old('email', $rendezVous->email) }}">
+            </div>
+            <div class="mb-4">
+                <label class="form-label">Choisir un médecin</label>
+                <select class="form-select" name="medecin_id" required>
                     <option value="">Sélectionnez un médecin</option>
                     @foreach($medecins as $medecin)
-                        <option value="{{ $medecin->id }}" {{ $rendezVous->medecin_id == $medecin->id ? 'selected' : '' }}>{{ $medecin->nom }} {{ $medecin->prenom }} ({{ optional($medecin->specialite)->nom ?? 'Non spécifié' }})</option>
+                        <option value="{{ $medecin->id }}" {{ $rendezVous->medecin_id == $medecin->id ? 'selected' : '' }}>
+                            {{ $medecin->nom }} {{ $medecin->prenom }}
+                        </option>
                     @endforeach
                 </select>
             </div>
             <div class="mb-4">
-                <label for="date_heure" class="block text-sm font-medium text-gray-700">Date et heure</label>
-                <input type="datetime-local" name="date_heure" id="date_heure" value="{{ $rendezVous->date_heure->format('Y-m-d\TH:i') }}" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <label class="form-label">Date du rendez-vous</label>
+                <input type="datetime-local" class="form-control" name="date_heure"
+                    value="{{ old('date_heure', \Carbon\Carbon::parse($rendezVous->date_heure)->format('Y-m-d\TH:i')) }}" required>
             </div>
             <div class="mb-4">
-                <label for="raison" class="block text-sm font-medium text-gray-700">Motif</label>
-                <textarea name="raison" id="raison" rows="4" class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">{{ $rendezVous->raison }}</textarea>
+                <label class="form-label">Message (optionnel)</label>
+                <textarea class="form-control" name="raison" rows="3">{{ old('raison', $rendezVous->raison) }}</textarea>
             </div>
             <div class="mb-4">
-                <label for="statut" class="block text-sm font-medium text-gray-700">Statut</label>
-                <select name="statut" id="statut" required class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                <label class="form-label">Statut</label>
+                <select class="form-select" name="statut" required>
                     <option value="en_attente" {{ $rendezVous->statut == 'en_attente' ? 'selected' : '' }}>En attente</option>
                     <option value="confirme" {{ $rendezVous->statut == 'confirme' ? 'selected' : '' }}>Confirmé</option>
                     <option value="annule" {{ $rendezVous->statut == 'annule' ? 'selected' : '' }}>Annulé</option>
