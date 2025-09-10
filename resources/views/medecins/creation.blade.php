@@ -69,6 +69,10 @@
                 <label for="annees_experience" class="block text-gray-700 font-semibold mb-2">Années d’expérience</label>
                 <input type="text" name="annees_experience" id="annees_experience" value="{{ old('annees_experience') }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
             </div>
+            <div class="mb-4">
+                <label for="telephone" class="block text-gray-700 font-semibold mb-2">Téléphone</label>
+                <input type="text" name="telephone" id="telephone" value="{{ old('telephone') }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500">
+            </div>
             <div class="mt-4">
                 <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">Créer</button>
                 <a href="{{ route('medecins.index') }}" class="inline-block bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 ml-2">Annuler</a>

@@ -38,24 +38,31 @@ class RendezVousController extends Controller
     public function create()
     {
         $medecins = Medecin::all();
+       if (request()->route()->getName() === 'welcome') {
         return view('welcome', compact('medecins'));
+    }
+
+    // Sinon, on affiche la page de création de rendez-vous
+    return view('rendezvous.creation', compact('medecins'));
+
     }
 
     public function store(Request $request)
     {
-        $validated = $request->validate([
-            'nom_complet' => 'required|string|max:255',
-            'medecin_id' => 'required|exists:medecins,id',
-            'email' => 'nullable|email',
-            'telephone' => 'required|string|max:20',
-            'date_heure' => 'required|date|after:now',
-            'raison' => 'nullable|string',
-        ]);
+        $request->validate([
+        'nom_complet' => 'required|string|max:255',
+        'telephone' => 'required|string|max:20',
+        'email' => 'nullable|email',
+        'medecin_id' => 'required|exists:medecins,id',
+        'date_heure' => 'required|date',
+        'raison' => 'nullable|string',
+        'statut' => 'required|string',
+    ]);
 
         // statut par défaut
-        $validated['statut'] = 'en_attente';
+    
 
-        RendezVous::create($validated);
+         RendezVous::create($request->all());
 
         return back()->with('success', 'Rendez-vous ajouté avec succès.');
     }
@@ -70,27 +77,28 @@ class RendezVousController extends Controller
     {
         $rendezVous = RendezVous::findOrFail($id);
         $medecins = Medecin::with('specialite')->get();
-        return view('rendezvous.modifier', compact('rendezVous', 'medecins'));
+        $patients =Patient::all();
+        return view('rendezvous.modifier', compact('rendezVous', 'medecins','patients'));
     }
+public function update(Request $request, $id)
+{
+    $rendezVous = RendezVous::findOrFail($id);
 
-    public function update(Request $request, $id)
-    {
-        $rendezVous = RendezVous::findOrFail($id);
+    $validated = $request->validate([
+         'patient_id'   => 'required|exists:patients,id',
+        'nom_complet' => 'required|string|max:255',
+        'medecin_id' => 'required|exists:medecins,id',
+        'date_heure' => 'required|date',
+        'email' => 'nullable|email',
+        'telephone' => 'required|string|max:20',
+        'raison' => 'nullable|string',
+        'statut' => 'required|in:en_attente,confirme,annule',
+    ]);
 
-        $validated = $request->validate([
-            'nom_complet' => 'required|string|max:255',
-            'medecin_id' => 'required|exists:medecins,id',
-            'date_heure' => 'required|date|after:now',
-            'email' => 'nullable|email',
-            'telephone' => 'required|string|max:20',
-            'raison' => 'nullable|string',
-            'statut' => 'required|in:en_attente,confirme,annule',
-        ]);
+    $rendezVous->update($validated);
 
-        $rendezVous->update($validated);
-
-        return redirect()->route('rendezvous.index')->with('success', 'Rendez-vous modifié avec succès.');
-    }
+    return redirect()->route('rendezvous.index')->with('success', 'Rendez-vous modifié avec succès.');
+}
 
     public function destroy($id)
     {
