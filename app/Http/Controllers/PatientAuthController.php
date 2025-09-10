@@ -4,9 +4,29 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Models\RendezVous;
+use ;
 
 class PatientAuthController extends Controller
 {
+    // Middleware pour s'assurer que seul le patient connecté accède
+    public function __construct()
+    {
+        $this->middleware('auth:patient');
+    }
+
+    // Afficher le tableau de bord
+    public function index()
+    {
+        $patient = Auth::guard('patient')->user();
+
+        // Ses rendez-vous uniquement
+        $rendezVous = RendezVous::where('patient_id', $patient->id)
+                                 ->orderBy('date', 'desc')
+                                 ->get();
+
+        return view('patient.dashboard', compact('patient', 'rendezVous'));
+    }
     // Afficher le formulaire de connexion
     public function showLoginForm()
     {
@@ -23,7 +43,7 @@ class PatientAuthController extends Controller
 
         if (Auth::guard('patient')->attempt($credentials, $request->filled('remember'))) {
             $request->session()->regenerate();
-            return redirect()->intended('/medecin/dashboard');
+            return redirect()->intended('/patient/dashboard');
         }
 
         return back()->withErrors([
@@ -34,9 +54,9 @@ class PatientAuthController extends Controller
     // Logout
     public function logout(Request $request)
     {
-        Auth::guard('medecin')->logout();
+        Auth::guard('patient')->logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
-        return redirect('/medecin/login');
+        return redirect('/patient/login');
     }
 }

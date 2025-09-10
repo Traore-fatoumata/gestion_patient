@@ -7,75 +7,58 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 
-/**
- * Class Medecin
- * 
- * @property int $id
- * @property int|null $utilisateur_id
- * @property string $nom
- * @property string $prenom
- * @property int $specialite_id
- * @property string|null $biographie
- * @property string|null $photo_url
- * @property string|null $annees_experience
- * @property Carbon|null $created_at
- * @property Carbon|null $updated_at
- * 
- * @property Specialite $specialite
- * @property Utilisateur|null $utilisateur
- * @property Collection|Consultation[] $consultations
- * @property Collection|RendezVous[] $rendez_vous
- *
- * @package App\Models
- */
-class Medecin extends Model
+class Medecin extends Authenticatable
 {
-	protected $table = 'medecins';
+    use Notifiable;
 
-	protected $casts = [
-		'utilisateur_id' => 'int',
-		'specialite_id' => 'int'
-	];
+    protected $table = 'medecins';
 
-	protected $fillable = [
-		'utilisateur_id',
-		'nom',
-		'prenom',
-		'specialite_id',
-		'biographie',
-		'photo_url',
-		'annees_experience'
-	];
+    protected $casts = [
+        'utilisateur_id' => 'int',
+        'specialite_id' => 'int'
+    ];
 
-	public function specialite()
-	{
-		return $this->belongsTo(Specialite::class);
-	}
+    protected $fillable = [
+        'utilisateur_id',
+        'nom',
+        'prenom',
+        'specialite_id',
+        'biographie',
+        'photo_url',
+        'annees_experience',
+        'telephone',
+        'password',
+    ];
 
-	public function utilisateur()
-	{
-		return $this->belongsTo(Utilisateur::class);
-	}
+    protected $hidden = ['password', 'remember_token'];
 
-	public function consultations()
-	{
-		return $this->hasMany(Consultation::class);
-	}
+    public function specialite()
+    {
+        return $this->belongsTo(Specialite::class);
+    }
 
-	public function rendez_vous()
-	{
-		return $this->hasMany(RendezVous::class);
-	}
+    public function utilisateur()
+    {
+        return $this->belongsTo(Utilisateur::class);
+    }
 
-	protected $hidden = ['password', 'remember_token'];
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class);
+    }
 
-// Si le téléphone sera le mot de passe, on peut hasher automatiquement lors de la création
-	public function setPasswordAttribute($value)
-	{
-		$this->attributes['password'] = bcrypt($value);
-	}
-	
+    public function rendez_vous()
+    {
+        return $this->hasMany(RendezVous::class);
+    }
+
+    public function setPasswordAttribute($value)
+{
+    $this->attributes['password'] = $value ? bcrypt($value) : bcrypt('default123');
+}
+
 }

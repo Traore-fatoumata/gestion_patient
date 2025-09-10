@@ -9,6 +9,8 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Notifications\Notifiable;
 
 /**
  * Class Patient
@@ -31,45 +33,48 @@ use Illuminate\Database\Eloquent\Model;
  *
  * @package App\Models
  */
-class Patient extends Model
+
+
+
+
+class Patient extends Authenticatable
 {
-	protected $table = 'patients';
+    use Notifiable;
 
-	protected $casts = [
-		'date_naissance' => 'datetime'
-	];
+    protected $table = 'patients';
 
-	protected $fillable = [
-		'nom',
-		'prenom',
-		'date_naissance',
-		'genre',
-		'adresse',
-		'telephone',
-		'courriel',
-		'groupe_sanguin',
-		'antecedents_medicaux'
-	];
+    protected $casts = [
+        'date_naissance' => 'datetime'
+    ];
 
-	public function consultations()
-	{
-		return $this->hasMany(Consultation::class);
-	}
+    protected $fillable = [
+        'nom',
+        'prenom',
+        'date_naissance',
+        'genre',
+        'adresse',
+        'telephone',
+        'courriel',
+        'groupe_sanguin',
+        'antecedents_medicaux',
+        'password',
+    ];
 
-	// public function rendez_vous()
-	// {
-	// 	return $this->hasMany(RendezVous::class);
-	// }
-	public function factures()
+    protected $hidden = ['password', 'remember_token'];
+
+    public function consultations()
+    {
+        return $this->hasMany(Consultation::class);
+    }
+
+    public function factures()
     {
         return $this->hasMany(Facture::class);
     }
 
-	protected $hidden = ['password', 'remember_token'];
-
-// Si le téléphone sera le mot de passe, on peut hasher automatiquement lors de la création
 	public function setPasswordAttribute($value)
-	{
-		$this->attributes['password'] = bcrypt($value);
-	}
+{
+    $this->attributes['password'] = $value ? bcrypt($value) : bcrypt('default123');
+}
+
 }
