@@ -1,77 +1,80 @@
 <?php
-
 namespace App\Http\Controllers;
 
 use App\Models\Facture;
 use App\Models\Patient;
-use App\Models\RendezVous;
 use Illuminate\Http\Request;
 
 class FactureController extends Controller
 {
     public function index()
     {
-        $factures = Facture::with(['patient', 'rendezVous.medecin'])->get();
+        $factures = Facture::with('patient')->get();
         $patients = Patient::all();
-        $rendezVous = RendezVous::all();
-        return view('factures.index', compact('factures','patients','rendezVous'));
+        return view('factures.index', compact('factures', 'patients'));
     }
 
     public function create()
     {
         $patients = Patient::all();
-        $rendezVous = RendezVous::with('patient', 'medecin')->get();
-        return view('factures.create', compact('patients', 'rendezVous'));
+        return view('factures.create', compact('patients'));
     }
 
-   public function store(Request $request)
+    public function store(Request $request)
     {
-    $validated = $request->validate([
-        'patient_id' => 'required|exists:patients,id',
-        'rendez_vous_id' => 'required|exists:rendez_vous,id',
-        'montant' => 'required|numeric|min:0',
-        'date_emission' => 'required|date',
-        'statut' => 'required|in:en_attente,payee,annulee',
-        'description' => 'nullable|string',
-    ]);
+        try {
+            $validated = $request->validate([
+                'patient_id' => 'required|exists:patients,id',
+                'montant' => 'required|numeric|min:0',
+                'date_emission' => 'required|date',
+                'statut' => 'required|in:en_attente,payee,annulee',
+                'description' => 'nullable|string',
+            ]);
 
-        // Générer un numéro unique automatiquement
-        $numero = 'FACT-' . date('Ymd') . '-' . str_pad(Facture::count() + 1, 4, '0', STR_PAD_LEFT);
+            // Générer un numéro unique
+            $numero = 'FACT-' . date('Ymd') . '-' . str_pad(Facture::count() + 1, 4, '0', STR_PAD_LEFT);
+            $validated['numero'] = $numero;
 
-        $validated['numero'] = $numero;
+            Facture::create($validated);
 
-        Facture::create($validated);
-
-        return redirect()->route('factures.index')->with('success', 'Facture ajoutée avec succès.');
+            return redirect()->route('factures.index')->with('success', 'Facture ajoutée avec succès.');
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la création de la facture : ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Une erreur est survenue : ' . $e->getMessage()])->withInput();
+        }
     }
-
 
     public function show(Facture $facture)
     {
-        $facture->load(['patient', 'rendezVous.medecin']);
+        $facture->load('patient');
         return view('factures.show', compact('facture'));
     }
 
     public function edit(Facture $facture)
     {
         $patients = Patient::all();
-        $rendezVous = RendezVous::with('patient', 'medecin')->get();
-        return view('factures.edit', compact('facture', 'patients', 'rendezVous'));
+        return view('factures.edit', compact('facture', 'patients'));
     }
 
     public function update(Request $request, Facture $facture)
     {
-        $validated = $request->validate([
-            'numero' => 'required|string|unique:factures,numero,' . $facture->id,
-            'patient_id' => 'required|exists:patients,id',
-            'rendez_vous_id' => 'required|exists:rendez_vous,id',
-            'montant' => 'required|numeric|min:0',
-            'date_emission' => 'required|date',
-            'statut' => 'required|in:en_attente,payee,annulee',
-            'description' => 'nullable|string',
-        ]);
+        try {
+            $validated = $request->validate([
+                'patient_id' => 'required|exists:patients,id',
+                'montant' => 'required|numeric|min:0',
+                'date_emission' => 'required|date',
+                'statut' => 'required|in:en_attente,payee,annulee',
+                'description' => 'nullable|string',
+            ]);
 
-        $facture->update($validated);
-        return redirect()->route('factures.index')->with('success', 'Facture modifiée avec succès.');
+            // Conserver le numéro existant
+            $validated['numero'] = $facture->numero;
+
+            $facture->update($validated);
+            return redirect()->route('factures.index')->with('success', 'Facture modifiée avec succès.');
+        } catch (\Exception $e) {
+            \Log::error('Erreur lors de la modification de la facture : ' . $e->getMessage());
+            return redirect()->back()->withErrors(['error' => 'Une erreur est survenue : ' . $e->getMessage()])->withInput();
+        }
     }
 }

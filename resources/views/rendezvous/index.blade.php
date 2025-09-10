@@ -3,10 +3,11 @@
 <section class="container mx-auto py-12">
     <h1 class="text-4xl font-bold mb-6">Gestion des Rendez-vous</h1>
 
-    <!-- Bouton Ajouter -->
+    <!-- Bouton Ajouter 
     <button type="button" class="btn btn-primary mb-4" data-bs-toggle="modal" data-bs-target="#ajouterRdvModal">
         Ajouter un Rendez-vous
     </button>
+    -->
 
     <!-- Recherche -->
     <form method="GET" action="{{ route('rendezvous.index') }}" class="mb-6 d-flex gap-2">

@@ -1,12 +1,8 @@
 <?php
-
-/**
- * Created by Reliese Model.
- */
-
 namespace App\Models;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 /**
@@ -15,7 +11,6 @@ use Illuminate\Database\Eloquent\Model;
  * @property int $id
  * @property string $numero
  * @property int $patient_id
- * @property int $rendez_vous_id
  * @property float $montant
  * @property Carbon $date_emission
  * @property string $statut
@@ -24,38 +19,30 @@ use Illuminate\Database\Eloquent\Model;
  * @property Carbon|null $updated_at
  * 
  * @property Patient $patient
- * @property RendezVou $rendez_vou
- *
- * @package App\Models
  */
 class Facture extends Model
 {
-	protected $table = 'factures';
+    use HasFactory;
 
-	protected $casts = [
-		'patient_id' => 'int',
-		'rendez_vous_id' => 'int',
-		'montant' => 'float',
-		'date_emission' => 'datetime'
-	];
+    protected $table = 'factures';
 
-	protected $fillable = [
-		'numero',
-		'patient_id',
-		'rendez_vous_id',
-		'montant',
-		'date_emission',
-		'statut',
-		'description'
-	];
+    protected $casts = [
+        'patient_id' => 'int',
+        'montant' => 'float',
+        'date_emission' => 'datetime'
+    ];
 
-	public function patient()
-	{
-		return $this->belongsTo(Patient::class);
-	}
+    protected $fillable = [
+        'numero',
+        'patient_id',
+        'montant',
+        'date_emission',
+        'statut',
+        'description'
+    ];
 
-	public function rendez_vou()
-	{
-		return $this->belongsTo(RendezVou::class, 'rendez_vous_id');
-	}
+    public function patient()
+    {
+        return $this->belongsTo(Patient::class);
+    }
 }

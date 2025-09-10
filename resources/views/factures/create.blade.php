@@ -29,27 +29,19 @@
                 </ul>
             </div>
         @endif
+        @if ($patients->isEmpty())
+            <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 mb-6" role="alert">
+                Aucun patient disponible. Veuillez ajouter un patient avant de créer une facture.
+            </div>
+        @endif
         <form action="{{ route('factures.store') }}" method="POST" class="max-w-lg mx-auto bg-white p-6 rounded-lg shadow-md">
             @csrf
-            <div class="mb-4">
-                <label for="numero" class="block text-gray-700 font-semibold mb-2">Numéro de facture</label>
-                <input type="text" name="numero" id="numero" value="{{ old('numero') }}" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-            </div>
             <div class="mb-4">
                 <label for="patient_id" class="block text-gray-700 font-semibold mb-2">Patient</label>
                 <select name="patient_id" id="patient_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
                     <option value="">Sélectionner un patient</option>
                     @foreach ($patients as $patient)
                         <option value="{{ $patient->id }}" {{ old('patient_id') == $patient->id ? 'selected' : '' }}>{{ $patient->nom }} {{ $patient->prenom }}</option>
-                    @endforeach
-                </select>
-            </div>
-            <div class="mb-4">
-                <label for="rendez_vous_id" class="block text-gray-700 font-semibold mb-2">Rendez-vous</label>
-                <select name="rendez_vous_id" id="rendez_vous_id" class="w-full px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" required>
-                    <option value="">Sélectionner un rendez-vous</option>
-                    @foreach ($rendezVous as $rdv)
-                        <option value="{{ $rdv->id }}" {{ old('rendez_vous_id') == $rdv->id ? 'selected' : '' }}>{{ $rdv->date_heure }} - {{ $rdv->patient->nom }} ({{ $rdv->medecin->nom }})</option>
                     @endforeach
                 </select>
             </div>

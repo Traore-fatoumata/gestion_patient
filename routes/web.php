@@ -7,7 +7,7 @@ use App\Http\Controllers\OrdonnanceController;
 use App\Http\Controllers\PatientController;
 use App\Http\Controllers\MedecinController;
 use App\Http\Controllers\FactureController;
-use App\Http\Controllers\StatistiquesController; 
+use App\Http\Controllers\StatistiquesController;
 
 Route::resource('patients', PatientController::class)->names([
     'index' => 'patients.index',
