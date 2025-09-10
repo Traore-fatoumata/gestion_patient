@@ -15,7 +15,14 @@ class StatistiquesController extends Controller
     {
         // Nombre total de patients consultés (patients avec au moins une consultation)
         $totalPatients = Consultation::distinct('patient_id')->count('patient_id');
+         // Nombre total de médecins (tous)
+         $totalMedecins = Medecin::count();
 
+   
+    // Nombre total de rendez-vous
+    $totalRendezVous = RendezVous::count();
+
+    // ...existing code...
         // Pathologies fréquentes (basé sur la colonne diagnostic de consultations)
         $pathologiesFrequentes = Consultation::select('diagnostic', DB::raw('COUNT(*) as total'))
             ->whereNotNull('diagnostic')
@@ -31,6 +38,7 @@ class StatistiquesController extends Controller
             ->orderByDesc('total_rdv')
             ->get();
 
-        return view('statistiques.index', compact('totalPatients', 'pathologiesFrequentes', 'rendezVousParMedecin'));
+        return view('statistiques.index', compact('totalPatients', 'pathologiesFrequentes', 'rendezVousParMedecin', 'totalMedecins',
+        'totalRendezVous'));
     }
 }
