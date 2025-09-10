@@ -20,7 +20,7 @@
             <div class="card text-center shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Médecins</h5>
-                    <h2 class="fw-bold text-success">{{ $totalMedecins ?? 0 }}</h2>
+                    <h2 class="fw-bold text-success">{{ $totalMedecins }}</h2>
                     <small class="text-muted">Disponibles</small>
                 </div>
             </div>
@@ -30,7 +30,7 @@
             <div class="card text-center shadow-sm border-0">
                 <div class="card-body">
                     <h5 class="card-title text-muted">Rendez-vous</h5>
-                    <h2 class="fw-bold text-danger">{{ $totalRendezVous ?? 0 }}</h2>
+                    <h2 class="fw-bold text-danger">{{ $totalRendezVous}}</h2>
                     <small class="text-muted">Enregistrés</small>
                 </div>
             </div>

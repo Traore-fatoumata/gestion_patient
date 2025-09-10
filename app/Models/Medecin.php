@@ -69,4 +69,13 @@ class Medecin extends Model
 	{
 		return $this->hasMany(RendezVous::class);
 	}
+
+	protected $hidden = ['password', 'remember_token'];
+
+// Si le téléphone sera le mot de passe, on peut hasher automatiquement lors de la création
+	public function setPasswordAttribute($value)
+	{
+		$this->attributes['password'] = bcrypt($value);
+	}
+	
 }

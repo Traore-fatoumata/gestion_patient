@@ -14,7 +14,9 @@ class StatistiquesController extends Controller
     public function index()
     {
         // Nombre total de patients consultés (patients avec au moins une consultation)
-        $totalPatients = Consultation::distinct('patient_id')->count('patient_id');
+       $totalPatients = Patient::count();
+        $totalRendezVous = RendezVous::count();
+        $totalMedecins = Medecin::count();
 
         // Pathologies fréquentes (basé sur la colonne diagnostic de consultations)
         $pathologiesFrequentes = Consultation::select('diagnostic', DB::raw('COUNT(*) as total'))
@@ -25,12 +27,13 @@ class StatistiquesController extends Controller
             ->get();
 
         // Nombre de rendez-vous par médecin
-        $rendezVousParMedecin = RendezVous::select('medecins.nom', 'medecins.prenom', DB::raw('COUNT(*) as total_rdv'))
-            ->join('medecins', 'rendez_vous.medecin_id', '=', 'medecins.id')
-            ->groupBy('medecins.nom', 'medecins.prenom')
-            ->orderByDesc('total_rdv')
-            ->get();
+        $rendezVousParMedecin = RendezVous::select('medecins.id', 'medecins.nom', 'medecins.prenom', DB::raw('COUNT(*) as total_rdv'))
+        ->join('medecins', 'rendez_vous.medecin_id', '=', 'medecins.id')
+        ->groupBy('medecins.id', 'medecins.nom', 'medecins.prenom')
+        ->orderByDesc('total_rdv')
+        ->get();
 
-        return view('statistiques.index', compact('totalPatients', 'pathologiesFrequentes', 'rendezVousParMedecin'));
+
+        return view('statistiques.index', compact('totalPatients', 'pathologiesFrequentes', 'rendezVousParMedecin','totalRendezVous','totalMedecins'));
     }
 }

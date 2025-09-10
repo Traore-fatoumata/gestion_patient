@@ -8,6 +8,8 @@ use App\Http\Controllers\PatientController;
 use App\Http\Controllers\MedecinController;
 use App\Http\Controllers\FactureController;
 use App\Http\Controllers\StatistiquesController;
+use App\Http\Controllers\MedecinAuthController;
+use App\Http\Controllers\PatientAuthController;
 
 Route::resource('patients', PatientController::class)->names([
     'index' => 'patients.index',
@@ -56,3 +58,36 @@ Route::resource('factures', FactureController::class)->names([
 ]);
 Route::get('statistiques', [StatistiquesController::class, 'index'])->name('statistiques.index');
 // Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
+// Routes pour Médecin
+Route::prefix('medecin')->name('medecin.')->group(function () {
+    Route::get('login', [MedecinAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [MedecinAuthController::class, 'login'])->name('login.submit');
+    Route::post('logout', [MedecinAuthController::class, 'logout'])->name('logout');
+
+    // Middleware auth:medecin protège les routes suivantes
+    Route::middleware('auth:medecin')->group(function () {
+        Route::get('dashboard', function () {
+            return view('medecins.dashboard');
+        })->name('dashboard');
+
+        // Autres routes privées pour les Médecins
+        Route::resource('consultations', ConsultationController::class);
+    });
+});
+
+// Routes pour Patient
+Route::prefix('patient')->name('patient.')->group(function () {
+    Route::get('login', [PatientAuthController::class, 'showLoginForm'])->name('login');
+    Route::post('login', [PatientAuthController::class, 'login'])->name('login.submit');
+    Route::post('logout', [PatientAuthController::class, 'logout'])->name('logout');
+
+    // Middleware auth:patient protège les routes suivantes
+    Route::middleware('auth:patient')->group(function () {
+        Route::get('dashboard', function () {
+            return view('patients.dashboard');
+        })->name('dashboard');
+
+        // Autres routes privées pour les Patients
+        Route::resource('mes-rendezvous', RendezVousController::class);
+    });
+});

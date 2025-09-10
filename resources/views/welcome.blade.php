@@ -171,6 +171,10 @@
                     <li class="nav-item"><a class="nav-link" href="#blog">Blog</a></li>
                     <li class="nav-item"><a class="nav-link" href="#contact">Contact</a></li>
                 </ul>
+                <!-- Bouton principal sur le site vitrine -->
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
+                Se connecter
+            </button>
             </div>
         </div>
     </nav>
@@ -512,6 +516,26 @@
         </div>
     </section>
 
+    <!-- Modal -->
+    <div class="modal fade" id="loginModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Se connecter</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+            <div class="modal-body text-center">
+            <p>Connectez-vous en tant que :</p>
+            <div class="d-grid gap-2">
+            <a href="{{ route('medecin.login') }}" class="btn btn-primary btn-lg">Médecin</a>
+            <a href="{{ route('patient.login') }}" class="btn btn-success btn-lg">Patient</a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
     <!-- Footer -->
     <footer>
         <div class="container">
@@ -562,8 +586,5 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
-<<<<<<< HEAD
 </html>
-=======
-</html>
->>>>>>> f006e279551d58ad68932b652fea026b56c14343
+

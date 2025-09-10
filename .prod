@@ -1,7 +1,7 @@
 APP_NAME="Gestion Patient"
 APP_ENV=local
 APP_KEY=base64:jPupqqWkZWYDpXAQyVhgR6cK4P17JIj6D2FP4UAY8mI=
-APP_DEBUG=true
+APP_DEBUG=false
 APP_URL=http://localhost
 
 APP_LOCALE=en
