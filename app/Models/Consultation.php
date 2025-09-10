@@ -62,9 +62,9 @@ class Consultation extends Model
 		return $this->belongsTo(Patient::class);
 	}
 
-	public function rendez_vou()
+	public function rendez_vous()
 	{
-		return $this->belongsTo(RendezVou::class, 'rendez_vous_id');
+		return $this->belongsTo(RendezVous::class);
 	}
 
 	public function ordonnances()

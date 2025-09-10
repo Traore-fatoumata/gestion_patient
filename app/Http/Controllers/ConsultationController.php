@@ -12,7 +12,7 @@ class ConsultationController extends Controller
     public function index(Request $request)
     {
         $search = $request->query('search');
-        $consultations = Consultation::with(['patient', 'medecin', 'rendezVous'])
+        $consultations = Consultation::with(['patient', 'medecin', 'rendez_Vous'])
             ->when($search, function ($query, $search) {
                 $query->whereHas('patient', function ($q) use ($search) {
                     $q->where('nom', 'like', "%$search%")
@@ -24,25 +24,27 @@ class ConsultationController extends Controller
             })
             ->paginate(10);
         $patients = Patient::all();
-        return view('consultations.index', compact('consultations','patients'));
+        $medecins = Medecin::all();
+
+        return view('consultations.index', compact('consultations','patients','medecins'));
     }
 
     public function create()
     {
         $rendezVous = RendezVous::with(['patient', 'medecin'])->get();
-        return view('consultations.create', compact('rendezVous'));
+        return view('consultations.index', compact('rendezVous'));
     }
 
     public function store(Request $request)
     {
         $validated = $request->validate([
             // 'rendez_vous_id' => 'nullable|exists:rendez_vous,id',
-            'date_consultation' => 'required|date|after:now',
+            'date' => 'required|date|after:now',
             'notes' => 'nullable|string',
             'diagnostic' => 'nullable|string',
             'traitement' => 'nullable|string',
-            'patient_id' => 'required|exists:patient,id',
-            'medecin_id' => 'required|exists:medecin,id'
+            'patient_id' => 'required|exists:patients,id',
+            'medecin_id' => 'required|exists:medecins,id'
         ]);
 
         // // Récupérer le rendez-vous pour remplir patient_id et medecin_id
@@ -56,7 +58,7 @@ class ConsultationController extends Controller
 
     public function show($id)
     {
-        $consultation = Consultation::with(['patient', 'medecin', 'rendezVous'])->findOrFail($id);
+        $consultation = Consultation::with(['patient', 'medecin', 'rendez_Vous'])->findOrFail($id);
         return view('consultations.show', compact('consultation'));
     }
 
@@ -72,7 +74,7 @@ class ConsultationController extends Controller
         $consultation = Consultation::findOrFail($id);
         $validated = $request->validate([
             'rendez_vous_id' => 'required|exists:rendez_vous,id',
-            'date_consultation' => 'required|date|after:now',
+            'date' => 'required|date|after:now',
             'notes' => 'nullable|string',
             'diagnostic' => 'nullable|string',
             'traitement' => 'nullable|string',
