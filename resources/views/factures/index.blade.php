@@ -149,10 +149,10 @@
                                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                                 </div>
                                 <div class="modal-body">
-                                    <div class="mb-3">
+                                    {{-- <div class="mb-3">
                                         <label>Numéro</label>
                                         <input type="text" name="numero" class="form-control" required>
-                                    </div>
+                                    </div> --}}
                                     <div class="mb-3">
                                         <label>Patient</label>
                                         <select name="patient_id" class="form-select" required>
@@ -163,16 +163,16 @@
                                             @endforeach
                                         </select>
                                     </div>
-                                    <div class="mb-3">
+                                    {{-- <div class="mb-3">
                                         <label>Rendez-vous</label>
                                         <select name="rendez_vous_id" class="form-select" required>
                                             @foreach ($rendezVous as $rdv)
                                                 <option value="{{ $rdv->id }}">
-                                                    {{ $rdv->date_heure->format('d/m/Y H:i') }} - {{ $rdv->patient->nom }} ({{ $rdv->medecin->nom }})
+                                                    {{ $rdv->date_heure->format('d/m/Y H:i') }} - {{ $rdv->nom_complet }} ({{ $rdv->medecin->nom }})
                                                 </option>
                                             @endforeach
                                         </select>
-                                    </div>
+                                    </div> --}}
                                     <div class="mb-3">
                                         <label>Montant (FG)</label>
                                         <input type="number" step="0.01" name="montant"  class="form-control" required>

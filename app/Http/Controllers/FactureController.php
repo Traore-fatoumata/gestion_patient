@@ -24,21 +24,27 @@ class FactureController extends Controller
         return view('factures.create', compact('patients', 'rendezVous'));
     }
 
-    public function store(Request $request)
+   public function store(Request $request)
     {
-        $validated = $request->validate([
-            'numero' => 'required|string|unique:factures,numero',
-            'patient_id' => 'required|exists:patients,id',
-            'rendez_vous_id' => 'required|exists:rendez_vous,id',
-            'montant' => 'required|numeric|min:0',
-            'date_emission' => 'required|date',
-            'statut' => 'required|in:en_attente,payee,annulee',
-            'description' => 'nullable|string',
-        ]);
+    $validated = $request->validate([
+        'patient_id' => 'required|exists:patients,id',
+        'rendez_vous_id' => 'required|exists:rendez_vous,id',
+        'montant' => 'required|numeric|min:0',
+        'date_emission' => 'required|date',
+        'statut' => 'required|in:en_attente,payee,annulee',
+        'description' => 'nullable|string',
+    ]);
+
+        // Générer un numéro unique automatiquement
+        $numero = 'FACT-' . date('Ymd') . '-' . str_pad(Facture::count() + 1, 4, '0', STR_PAD_LEFT);
+
+        $validated['numero'] = $numero;
 
         Facture::create($validated);
+
         return redirect()->route('factures.index')->with('success', 'Facture ajoutée avec succès.');
     }
+
 
     public function show(Facture $facture)
     {

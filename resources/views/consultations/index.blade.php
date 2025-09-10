@@ -3,7 +3,10 @@
 <div class="container py-5">
     <div class="d-flex justify-content-between align-items-center-md">
         <h1 class="text-3xl font-bold mb-6">Gestion des Consultations</h1>
-        <button href="#createConsultation" class="btn btn-info text-white px-4 py-2 rounded-lg mb-4 inline-block">Ajouter une Consultation</button>
+        <button type="button" class="btn btn-info text-white px-4 py-2 rounded-lg mb-4" 
+        data-bs-toggle="modal" data-bs-target="#createConsultation">
+            Ajouter une Consultation
+        </button>
         <form method="GET" action="{{ route('consultations.index') }}" class="mb-6">
             <input type="text" name="search" placeholder="Rechercher par patient ou médecin" value="{{ request('search') }}" class="border p-2 rounded-lg">
             <button type="submit" class="btn btn-info text-white px-4 py-2 rounded-lg">Rechercher</button>
@@ -53,13 +56,54 @@
     <div class="mt-4">{{ $consultations->links() }}</div>
 
 </div>
-<div class="modal fade" id="createConsultation" tabindex="-1">
-    <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content">
-            <form action="{{route('consultations.store')}}" method="POST">
 
-            </form>
+
+<!-- Modal Ajouter -->
+<div class="modal fade" id="createConsultation" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <form action="{{ route('consultations.store') }}" method="POST">
+        @csrf
+        <div class="modal-header">
+          <h5 class="modal-title">Ajouter une Consultation</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
         </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="patients_id" class="form-label">Patient</label>
+            <select name="patients_id" class="form-select" required>
+              <option value="">Sélectionnez un patient</option>
+              @foreach($patients as $patient)
+                <option value="{{ $patient->id }}">
+                  {{ $patient->nom }} {{ $patient->prenom }} - 
+                  
+                </option>
+              @endforeach
+            </select>
+          </div>
+          <div class="mb-3">
+            <label for="date_consultation" class="form-label">Date de consultation</label>
+            <input type="datetime-local" name="date_consultation" class="form-control" required>
+          </div>
+          <div class="mb-3">
+            <label for="notes" class="form-label">Notes</label>
+            <textarea name="notes" class="form-control"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="diagnostic" class="form-label">Diagnostic</label>
+            <textarea name="diagnostic" class="form-control"></textarea>
+          </div>
+          <div class="mb-3">
+            <label for="traitement" class="form-label">Traitement</label>
+            <textarea name="traitement" class="form-control"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">Ajouter</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+        </div>
+      </form>
     </div>
+  </div>
 </div>
 @endsection

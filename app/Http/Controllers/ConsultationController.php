@@ -23,7 +23,8 @@ class ConsultationController extends Controller
                 });
             })
             ->paginate(10);
-        return view('consultations.index', compact('consultations'));
+        $patients = Patient::all();
+        return view('consultations.index', compact('consultations','patients'));
     }
 
     public function create()
@@ -35,17 +36,19 @@ class ConsultationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'rendez_vous_id' => 'required|exists:rendez_vous,id',
+            // 'rendez_vous_id' => 'nullable|exists:rendez_vous,id',
             'date_consultation' => 'required|date|after:now',
             'notes' => 'nullable|string',
             'diagnostic' => 'nullable|string',
             'traitement' => 'nullable|string',
+            'patient_id' => 'required|exists:patient,id',
+            'medecin_id' => 'required|exists:medecin,id'
         ]);
 
-        // Récupérer le rendez-vous pour remplir patient_id et medecin_id
-        $rendezVous = RendezVous::findOrFail($validated['rendez_vous_id']);
-        $validated['patient_id'] = $rendezVous->patient_id;
-        $validated['medecin_id'] = $rendezVous->medecin_id;
+        // // Récupérer le rendez-vous pour remplir patient_id et medecin_id
+        // $rendezVous = RendezVous::findOrFail($validated['rendez_vous_id']);
+        // $validated['patient_id'] = $rendezVous->patient_id;
+        // $validated['medecin_id'] = $rendezVous->medecin_id;
 
         Consultation::create($validated);
         return redirect()->route('consultations.index')->with('success', 'Consultation ajoutée avec succès.');

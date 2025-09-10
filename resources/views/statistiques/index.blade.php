@@ -111,30 +111,95 @@
 
     <!-- Graphique des pathologies fréquentes -->
     @if(!$pathologiesFrequentes->isEmpty())
-        <div class="card shadow-sm border-0">
+        <div class="card shadow-sm border-0 mb-5">
             <div class="card-body">
                 <h2 class="h5 fw-bold mb-3">Graphique des diagnostics fréquents</h2>
                 <canvas id="pathologiesChart"></canvas>
             </div>
         </div>
-        <script>
-            const ctx = document.getElementById('pathologiesChart').getContext('2d');
-            new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: {!! json_encode($pathologiesFrequentes->pluck('diagnostic')->toArray()) !!},
-                    datasets: [{
-                        label: 'Nombre de cas',
-                        data: {!! json_encode($pathologiesFrequentes->pluck('total')->toArray()) !!},
-                        backgroundColor: [
-                            'rgba(13, 110, 253, 0.6)',
-                            'rgba(25, 135, 84, 0.6)',
-                            'rgba(220, 53, 69, 0.6)',
-                            'rgba(255, 193, 7, 0.6)',
-                            'rgba(111, 66, 193, 0.6)'
-                        ],
-                        borderColor: [
-                            'rgba(13, 110, 253, 1)',
-                            'rgba(25, 135, 84, 1)',
-                            'rgba(220, 53, 69, 1)',
-                            '
+    @endif
+
+    <!-- Graphique des rendez-vous par médecin -->
+    @if(!$rendezVousParMedecin->isEmpty())
+        <div class="card shadow-sm border-0">
+            <div class="card-body">
+                <h2 class="h5 fw-bold mb-3">Graphique des rendez-vous par médecin</h2>
+                <canvas id="medecinsChart"></canvas>
+            </div>
+        </div>
+    @endif
+</div>
+
+<!-- Scripts Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    @if(!$pathologiesFrequentes->isEmpty())
+        const ctxPatho = document.getElementById('pathologiesChart').getContext('2d');
+        new Chart(ctxPatho, {
+            type: 'bar',
+            data: {
+                labels: {!! json_encode($pathologiesFrequentes->pluck('diagnostic')->toArray()) !!},
+                datasets: [{
+                    label: 'Nombre de cas',
+                    data: {!! json_encode($pathologiesFrequentes->pluck('total')->toArray()) !!},
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.6)',
+                        'rgba(25, 135, 84, 0.6)',
+                        'rgba(220, 53, 69, 0.6)',
+                        'rgba(255, 193, 7, 0.6)',
+                        'rgba(111, 66, 193, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(13, 110, 253, 1)',
+                        'rgba(25, 135, 84, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(111, 66, 193, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { beginAtZero: true, ticks: { precision: 0 } }
+                }
+            }
+        });
+    @endif
+
+    @if(!$rendezVousParMedecin->isEmpty())
+        const ctxMed = document.getElementById('medecinsChart').getContext('2d');
+        new Chart(ctxMed, {
+            type: 'pie',
+            data: {
+                labels: {!! json_encode($rendezVousParMedecin->map(fn($m) => $m->nom . ' ' . $m->prenom)->toArray()) !!},
+                datasets: [{
+                    label: 'Nombre de rendez-vous',
+                    data: {!! json_encode($rendezVousParMedecin->pluck('total_rdv')->toArray()) !!},
+                    backgroundColor: [
+                        'rgba(13, 110, 253, 0.6)',
+                        'rgba(25, 135, 84, 0.6)',
+                        'rgba(220, 53, 69, 0.6)',
+                        'rgba(255, 193, 7, 0.6)',
+                        'rgba(111, 66, 193, 0.6)'
+                    ],
+                    borderColor: [
+                        'rgba(13, 110, 253, 1)',
+                        'rgba(25, 135, 84, 1)',
+                        'rgba(220, 53, 69, 1)',
+                        'rgba(255, 193, 7, 1)',
+                        'rgba(111, 66, 193, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+    @endif
+</script>
+@endsection
