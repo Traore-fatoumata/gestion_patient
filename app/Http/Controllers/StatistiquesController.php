@@ -14,10 +14,21 @@ class StatistiquesController extends Controller
     public function index()
     {
         // Nombre total de patients consultés (patients avec au moins une consultation)
+<<<<<<< HEAD
        $totalPatients = Patient::count();
         $totalRendezVous = RendezVous::count();
         $totalMedecins = Medecin::count();
+=======
+        $totalPatients = Consultation::distinct('patient_id')->count('patient_id');
+         // Nombre total de médecins (tous)
+         $totalMedecins = Medecin::count();
+>>>>>>> ee733202a7d22a05641317dc4073b20237b4a0aa
 
+   
+    // Nombre total de rendez-vous
+    $totalRendezVous = RendezVous::count();
+
+    // ...existing code...
         // Pathologies fréquentes (basé sur la colonne diagnostic de consultations)
         $pathologiesFrequentes = Consultation::select('diagnostic', DB::raw('COUNT(*) as total'))
             ->whereNotNull('diagnostic')
@@ -33,7 +44,12 @@ class StatistiquesController extends Controller
         ->orderByDesc('total_rdv')
         ->get();
 
+<<<<<<< HEAD
 
         return view('statistiques.index', compact('totalPatients', 'pathologiesFrequentes', 'rendezVousParMedecin','totalRendezVous','totalMedecins'));
+=======
+        return view('statistiques.index', compact('totalPatients', 'pathologiesFrequentes', 'rendezVousParMedecin', 'totalMedecins',
+        'totalRendezVous'));
+>>>>>>> ee733202a7d22a05641317dc4073b20237b4a0aa
     }
 }
